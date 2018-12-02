@@ -9,13 +9,23 @@ import (
 )
 
 func main() {
-	fmt.Println("hello world")
 	fs := readFile("./input.txt")
+	pm := make(map[int]bool)
 	frequency := 0
-	for _, f := range fs {
-		frequency += f
+	done := false
+	for !done {
+		for _, f := range fs {
+			frequency += f
+			_, ok := pm[frequency]
+			if ok {
+				fmt.Println("Already have:", frequency)
+				done = true
+				break
+			} else {
+				pm[frequency] = true
+			}
+		}
 	}
-	fmt.Println(frequency)
 }
 
 func readFile(path string) []int {
