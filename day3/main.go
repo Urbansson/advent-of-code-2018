@@ -13,6 +13,8 @@ type claim struct {
 	id   int
 	x, y int
 	w, h int
+
+	overlaps bool
 }
 
 func main() {
@@ -22,9 +24,12 @@ func main() {
 	fc := util.ReadFile(file)
 
 	// Create the grid
-	grid := make([][]int, 1000)
-	for i := range grid {
-		grid[i] = make([]int, 1000)
+	grid := make([][][]*claim, 1000)
+	for y := range grid {
+		grid[y] = make([][]*claim, 1000)
+		for x := range grid[y] {
+			grid[y][x] = make([]*claim, 0)
+		}
 	}
 
 	// Parse the input
@@ -33,28 +38,36 @@ func main() {
 		claims[i] = parse(f)
 	}
 
+	// "Render" th
 	for _, claim := range claims {
 		maxX := claim.x + claim.w
 		maxY := claim.y + claim.h
 		for y := claim.y; y < maxY; y++ {
 			for x := claim.x; x < maxX; x++ {
-				grid[y][x]++
+				grid[y][x] = append(grid[y][x], claim)
 			}
 		}
 	}
 
-	oi := 0
-	for _, row := range grid {
-		for _, count := range row {
-			if count == 0 {
-			} else {
-				if count > 1 {
-					oi++
+	total := 0
+	for y, row := range grid {
+		for x, claims := range row {
+			claimCount := len(claims)
+			if claimCount > 1 {
+				total++
+				for _, c := range grid[y][x] {
+					c.overlaps = true
 				}
 			}
 		}
 	}
-	fmt.Println(oi)
+	fmt.Println(total)
+	for _, c := range claims {
+		if !c.overlaps {
+			fmt.Println(c.id)
+		}
+	}
+
 	visualise(grid)
 }
 
@@ -72,16 +85,17 @@ func parse(l string) *claim {
 	w, _ := strconv.Atoi(size[0])
 	h, _ := strconv.Atoi(size[1])
 
-	return &claim{id, x, y, w, h}
+	return &claim{id, x, y, w, h, false}
 }
 
-func visualise(grid [][]int) {
+func visualise(grid [][][]*claim) {
 	f, _ := os.Create("/tmp/out.txt")
 	defer f.Close()
 
 	for _, row := range grid {
 		r := ""
-		for _, count := range row {
+		for _, claims := range row {
+			count := len(claims)
 			if count == 0 {
 				r += "."
 			} else {
