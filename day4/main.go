@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -92,8 +93,26 @@ func main() {
 		} else if max.totalSleepDuration() < g.totalSleepDuration() {
 			max = g
 		}
+
+		if max2 == nil {
+			max2 = g
+		}
+		_, mmcsm := max.mostCommonSleepMinute()
+		_, omcsm1 := g.mostCommonSleepMinute()
+
+		if mmcsm < omcsm1 {
+			max2 = g
+		}
 	}
-	fmt.Println(max.id, max.totalSleepDuration().Minutes(), max.mostCommonSleepMinute())
+
+	min, _ := max.mostCommonSleepMinute()
+	maxMin, _ := max2.mostCommonSleepMinute()
+
+	id, _ := strconv.Atoi(max.id)
+	id2, _ := strconv.Atoi(max2.id)
+
+	fmt.Println("part1:", id*min)
+	fmt.Println("part2:", id2*maxMin)
 }
 
 var replacer = strings.NewReplacer("Guard #", "", " begins shift", "")
@@ -115,9 +134,6 @@ func parse(input []string) []*log {
 		logs = append(logs, &log{t, p[1]})
 	}
 	sort.Slice(logs, func(i, j int) bool { return logs[i].Time.Before(logs[j].Time) })
-	for _, f := range logs {
-		fmt.Println(f.Time, f.Message)
-	}
 
 	return logs
 }
