@@ -2,10 +2,14 @@ package main
 
 import (
 	"fmt"
+	"math"
 	"os"
+	"strings"
 
 	"github.com/urbansson/advent-of-code/util"
 )
+
+var d = 'a' - 'A'
 
 func main() {
 	args := os.Args[1:]
@@ -15,10 +19,29 @@ func main() {
 	polymer := simulateReaction(fc)
 	fmt.Println("polymer length", len(polymer))
 
+	_, length := simulateImprovedReaction(fc)
+	fmt.Println("improved polymer length", length)
+}
+
+func simulateImprovedReaction(s string) (string, int) {
+
+	shortes := math.MaxInt64
+	improvedPolymer := ""
+	for i := 'a'; i <= 'z'; i++ {
+		improved := strings.Replace(s, string(i), "", -1)
+		improved = strings.Replace(improved, string(i-d), "", -1)
+		improved = simulateReaction(improved)
+		l := len(improved)
+		if l < shortes {
+			shortes = l
+			improvedPolymer = improved
+		}
+	}
+
+	return improvedPolymer, shortes
 }
 
 func simulateReaction(s string) string {
-	var d = 'a' - 'A'
 	i := 0
 	for i < len(s)-1 {
 		diff := rune(s[i]) - rune(s[i+1])
