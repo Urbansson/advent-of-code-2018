@@ -19,7 +19,7 @@ func main() {
 	polymer := simulateReaction(fc)
 	fmt.Println("polymer length", len(polymer))
 
-	_, length := simulateImprovedReaction(fc)
+	_, length := simulateImprovedReaction(polymer)
 	fmt.Println("improved polymer length", length)
 }
 
