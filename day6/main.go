@@ -70,6 +70,24 @@ func (g grid) calculateDangerAreas(points []*point) {
 	}
 }
 
+func (g grid) calculateSafeArea(points []*point) int {
+	area := 0
+	for x := g.minX; x <= g.maxX; x++ {
+		for y := g.minY; y <= g.maxY; y++ {
+			buffer := 0
+
+			for _, p := range points {
+				d := distance(*p, point{x, y, 0, false})
+				buffer += d
+			}
+
+			if buffer < 10000 {
+				area++
+			}
+		}
+	}
+	return area
+}
 func main() {
 	args := os.Args[1:]
 	file := args[0]
@@ -105,6 +123,10 @@ func main() {
 		}
 	}
 	fmt.Println("Larges area is:", max.area)
+
+	safe := grid.calculateSafeArea(points)
+
+	fmt.Println("Safe area is:", safe)
 
 }
 
